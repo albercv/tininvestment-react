@@ -168,9 +168,11 @@ input[type="button"]{
 
 .lateral input[type="text"],
 .lateral input[type="text"],
+.lateral input[type="number"],
 .lateral textarea,
 .edit_form input[type="text"],
 .edit_form input[type="text"],
+.edit_form input[type="number"],
 .edit_form textarea
 {
   display: block;
@@ -218,4 +220,8 @@ input[type="button"]{
   .peli-item{
       width: 80%;
   }
+}
+
+.notFoundError {
+  color: red;
 }

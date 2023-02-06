@@ -1,8 +1,12 @@
+import { useState } from "react";
 import Creator from "./component/Creator";
 import List from "./component/List";
 import Search from "./component/Search";
 
 function App() {
+
+  const [stampsState, setStampsState] = useState([])
+
   return (
     <div className="layout">
     {/*Cabecera*/}
@@ -26,13 +30,13 @@ function App() {
 
     {/*Contenido principal*/}
     <section id="content" className="content">
-      <List/>
+      <List stampsState={stampsState} setStampsState={setStampsState}/>
     </section>
 
     {/*Barra lateral*/}
     <aside className="lateral">
-       <Search/>
-        <Creator/>
+       <Search stampsState={stampsState} setStampsState={setStampsState}/>
+        <Creator setStampsState={setStampsState}/>
     </aside>
 
     {/*Pie de página*/}
