@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/albercv/tininvestment-react/static/css/main.75829ecd.css",
-    "main.js": "/albercv/tininvestment-react/static/js/main.50fb6100.js",
-    "index.html": "/albercv/tininvestment-react/index.html",
-    "main.75829ecd.css.map": "/albercv/tininvestment-react/static/css/main.75829ecd.css.map",
-    "main.50fb6100.js.map": "/albercv/tininvestment-react/static/js/main.50fb6100.js.map"
+    "main.css": "/tininvestment-react/static/css/main.75829ecd.css",
+    "main.js": "/tininvestment-react/static/js/main.50fb6100.js",
+    "index.html": "/tininvestment-react/index.html",
+    "main.75829ecd.css.map": "/tininvestment-react/static/css/main.75829ecd.css.map",
+    "main.50fb6100.js.map": "/tininvestment-react/static/js/main.50fb6100.js.map"
   },
   "entrypoints": [
     "static/css/main.75829ecd.css",
