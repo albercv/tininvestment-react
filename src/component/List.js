@@ -35,9 +35,12 @@ const List = ({stampsState, setStampsState}) => {
     <>
     {stampsState.length !== 0 ?
       stampsState.map(stamp => {
-        return (<article key={stamp.id} className="peli-item">
+        return (<article key={stamp.id} className="stamp-item">
           <h3 className="title">{stamp.title}</h3>
           <p className="description">evolve2digital.com</p>
+          <div>
+            <img alt={stamp.title} src={stamp.image} height="100" width="100"/>
+          </div>
 
           <button className="edit" onClick={() => {setEditState(stamp.id)}}>Editar</button>
           <button onClick={e => deleteStamp(e, stamp)} className="delete">Borrar</button>
