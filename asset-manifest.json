@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/tininvestment-react/static/css/main.75829ecd.css",
-    "main.js": "/tininvestment-react/static/js/main.50fb6100.js",
+    "main.js": "/tininvestment-react/static/js/main.9ce0df77.js",
     "index.html": "/tininvestment-react/index.html",
     "main.75829ecd.css.map": "/tininvestment-react/static/css/main.75829ecd.css.map",
-    "main.50fb6100.js.map": "/tininvestment-react/static/js/main.50fb6100.js.map"
+    "main.9ce0df77.js.map": "/tininvestment-react/static/js/main.9ce0df77.js.map"
   },
   "entrypoints": [
     "static/css/main.75829ecd.css",
-    "static/js/main.50fb6100.js"
+    "static/js/main.9ce0df77.js"
   ]
 }
