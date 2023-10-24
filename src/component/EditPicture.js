@@ -1,7 +1,7 @@
 import React from 'react'
 
 
-const EditStamp = ({stamp, getStampList, setEditState, setStampsState}) => {
+const EditPicture = ({picture, getpictureList, setEditState, setpicturesState}) => {
     const editObject = (e, id) => {
 
         e.preventDefault();
@@ -10,10 +10,10 @@ const EditStamp = ({stamp, getStampList, setEditState, setStampsState}) => {
 
         console.log(target);
 
-        const storagedStamps  = getStampList();
-        const editIndex = storagedStamps.findIndex(stamp => stamp.id === id);
+        const storagedpictures  = getpictureList();
+        const editIndex = storagedpictures.findIndex(picture => picture.id === id);
         
-        let editStamp = {
+        let editpicture = {
             id,
             title : target.title.value,
             ref : target.ref.value,
@@ -23,10 +23,10 @@ const EditStamp = ({stamp, getStampList, setEditState, setStampsState}) => {
             description : target.description.value
         }
 
-        storagedStamps[editIndex] = editStamp;
+        storagedpictures[editIndex] = editpicture;
 
-        localStorage.setItem("stamps", JSON.stringify(storagedStamps));
-        setStampsState(storagedStamps);
+        localStorage.setItem("pictures", JSON.stringify(storagedpictures));
+        setpicturesState(storagedpictures);
         setEditState(0);
 
     }
@@ -34,9 +34,9 @@ const EditStamp = ({stamp, getStampList, setEditState, setStampsState}) => {
     return (
     <div className='edit_form'>
       <h3 className='title'>Edit form</h3>
-      <input type="submit" onSubmit={e => editObject(e, stamp.id)} className="edit" value="Actualizar" />
+      <input type="submit" onSubmit={e => editObject(e, picture.id)} className="edit" value="Actualizar" />
     </div>
   )
 }
 
-export default EditStamp
+export default EditPicture

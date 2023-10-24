@@ -1,61 +1,67 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import EditStamp from './EditStamp';
+import React, { useEffect, useState } from 'react'
+import EditPicture from './EditPicture';
+import Creator from './Creator';
 import { fetchItems } from '../service/ApiConnection.js'
+import { SaveInStorage } from '../service/SaveInStorage';
+import { connect } from 'react-redux';
+import { setDraftPicture } from '../action/actions.js';
 
 
-const List = ({ stampsState, setStampsState }) => {
+const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
 
   const [editState, setEditState] = useState(0);
 
   useEffect(() => {
-    getStampList();
-    console.table(`STATE: ${stampsState}`);
+    getPictureList();
   }, []);
 
-  useEffect(() => {
-    console.table(`STATE: ${stampsState}`);
-  }, [stampsState]);
 
-  const getStampList = async () => {
+  const getPictureList = async () => {
+    const storagedData = dataStoredTime()
+    ? JSON.parse(localStorage.getItem("pictures")) : await fetchFreshData();
 
-    const fetched = await fetchItems();
-
-    console.log(fetched);
-    let localStoragedData = null;
-  
-    localStoragedData !== null ? setStampsState([]) : setStampsState(fetched)
-
-    return fetched;
+    setPicturesState(storagedData.data);
   }
 
-  const deleteStamp = (e, stamp) => {
-    console.log(stamp.id)
-    let localStoragedData = getStampList();
-    let filteredData = localStoragedData.filter(stampItem => stampItem.id !== parseInt(stamp.id));
+  const dataStoredTime = ()=>{
+    const storedTimepicture = Number(localStorage.getItem("timeStamp")) || Date.now();
+    const oneHourLaterTimepicture = Date.now();
+    return (oneHourLaterTimepicture - storedTimepicture > 360)
+  }
 
-    setStampsState(filteredData);
+  const fetchFreshData = async () => {
+    const freshData = await fetchItems();
 
-    localStorage.setItem("stamps", JSON.stringify(filteredData))
+    SaveInStorage("pictures", freshData.data);
+    SaveInStorage("timeStamp", freshData.timeStamp);
+
+    return freshData;
+  }
+
+  const deletePicture = (e, picture) => {
+    console.log(picture.id)
+    let localStoragedData = getPictureList();
+    let filteredData = localStoragedData.filter(pictureItem => pictureItem.id !== parseInt(picture.id));
+
+    setPicturesState(filteredData);
+
+    localStorage.setItem("pictures", JSON.stringify(filteredData))
 
   }
 
   return (
     <>
-      {stampsState.length !== 0 ?
-        stampsState.map(stamp => {
-          return (<article key={stamp.id} className="stamp-item">
-            {console.log(`ID: ${stamp.id}`)}
-            <h3 className="title">{stamp.title}</h3>
+      {picturesState.length !== 0 ?
+        picturesState.map(picture => {
+          return (<article key={picture.id} className="picture-item">
+            <h3 className="title">{picture.title}</h3>
             <p className="description">evolve2digital.com</p>
             <div>
-              <img alt={stamp.title} src={stamp.images[0].imageUrl} height="100" width="100" />
+              <img alt={picture.title} src={picture.images[0].imageUrl} height="100" width="100" />
             </div>
 
-            <button className="edit" onClick={() => { setEditState(stamp.id) }}>Editar</button>
-            <button onClick={e => deleteStamp(e, stamp)} className="delete">Borrar</button>
-            {editState === stamp.id && (
-              <EditStamp stamp={stamp} getStampList={getStampList} setEditState={setEditState} setStampsState={setStampsState} />
-            )}
+            <button className="edit" onClick={() => { setDraftPicture(picture)}}>Editar</button>
+            <button onClick={e => deletePicture(e, picture)} className="delete">Borrar</button>
           </article>)
         }) : "No hay sellos disponibles"}
 
@@ -63,4 +69,4 @@ const List = ({ stampsState, setStampsState }) => {
   )
 }
 
-export default List
+export default connect(null, { setDraftPicture })(List);

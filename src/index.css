@@ -103,7 +103,7 @@ body{
   flex-grow: 1;
 }
 
-.stamp-item{
+.picture-item{
   flex-grow: 1;
   background: white;
   border-radius: 10px;
@@ -130,21 +130,21 @@ input[type="button"]{
   transition: all 300ms;
 }
 
-.stamp-item .stamp-img {
+.picture-item .picture-img {
   max-height: 100px;
   max-width: 100px;
   padding: 10px;
 }
 
-.stamp-item .edit{
+.picture-item .edit{
   margin-right: 5px;
 }
 
-.stamp-item .edit:hover{
+.picture-item .edit:hover{
   background: #e77b00;
 }
 
-.stamp-item .delete:hover{
+.picture-item .delete:hover{
   background: #9b0202;
 }
 
@@ -219,7 +219,7 @@ input[type="button"]{
       align-items: center;
   }
 
-  .stamp-item{
+  .picture-item{
       width: 80%;
   }
 }

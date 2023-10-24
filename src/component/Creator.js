@@ -1,128 +1,150 @@
-import React, { useState } from 'react'
-import { SaveInStorage } from '../service/SaveInStorage'
-import { useForm } from 'react-hook-form';
-import axios from 'axios'
+import React, { useState, useEffect, useRef } from 'react'
+import { useForm, useFieldArray } from 'react-hook-form';
+import { connect } from 'react-redux';
+import { apiCreateNewPicture, apiEditPicture } from '../service/ApiConnection.js'
 
-const Creator = ({ setStampsState }) => {
+const Creator = ({ draftPictureState, setPicturesState }) => {
 
     const componentTitle = "Picture"
     const [setStampState] = useState({})
-    const [newPicture, setNewPicture] = useState({})
-    const { register } = useForm();
+    const formRef = useRef(null);
 
-    const username = 'Alber';
-    const password = '1234';
-
-    const token = btoa(`${username}:${password}`);
-    console.log(token);
-
-    const getPicture = () => {
-        console.log("Get Pictures");
-        axios.get("http://localhost:8080/api/picture/1", {
-            headers: {
-                'Authorization': `Basic ${token}`
-            }
-        })
-            .then(res => {
-                succesfulResponse(res.data);
-            })
-            .catch(err => {
-                errorResponse(err);
-            })
-            .finally(() => {
-                console.log("Clean Up");
-            })
-    }
-
-    const succesfulResponse = (response) => {
-        setStampState(response)
-        console.log(response);
-    }
-
-    const errorResponse = (error) => {
-        console.log(error);
-    }
-
-    const createNewPicture = (e) => {
-        e.preventDefault();
-        
-        let target = e.target;
-        let editStamp = {
-            id: target.id.value,
-            title : target.title.value,
-            reference : target.ref.value,
-            images : [target.image.value, target.image2.value],
-            price : target.price.value,
-            quantity : target.quantity.value,
-            description : target.description.value
+    const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
+        defaultValues: {
+            // id: draftPictureState ? draftPictureState.id : "",
+            // title: draftPictureState ? draftPictureState.title : "",
+            // reference: draftPictureState ? draftPictureState.reference : "",
+            // price: draftPictureState ? draftPictureState.price : "",
+            // quantity: draftPictureState ? draftPictureState.quantity : "",
+            // description: draftPictureState ? draftPictureState.description : "",
+            // images: draftPictureState ? draftPictureState.images : [{ imageUrl: '' }]
         }
+    });
+    const { fields, append, prepend, remove } = useFieldArray({
+        control,
+        name: 'images',
+    });
 
-        axios.post("http://localhost:8080/api/picture/create", JSON.stringify(editStamp),{
-            headers: {
-                'Authorization': `Basic ${token}`,
-                'Content-Type': 'application/json'
-            }
+    useEffect(() => {
+        formRef.current.reset();
+        reset({
+            id: draftPictureState ? draftPictureState.id : "",
+            title: draftPictureState ? draftPictureState.title : "",
+            reference: draftPictureState ? draftPictureState.reference : "",
+            price: draftPictureState ? draftPictureState.price : "",
+            quantity: draftPictureState ? draftPictureState.quantity : "",
+            description: draftPictureState ? draftPictureState.description : "",
         })
-            .then(res => {
-                succesfulResponse(res.data);
-            })
-            .catch(err => {
-                errorResponse(err);
-            })
-            .finally(() => {
-                console.log("Clean Up");
-            })
+    }, [draftPictureState]);
+
+    const resetForm = () => {
+        reset({
+            id: "",
+            title: "",
+            reference: "",
+            price: "",
+            quantity: "",
+            description: "",
+        })
+
+        remove();
+        append({
+            images: [{ imageUrl: '' }]
+        })
+    };
+
+    const processPicture = (values) => {
+
+        let editPicture = {
+            id: values.id,
+            title: values.title,
+            reference: values.reference,
+            images: values.images.map(imageField => imageField.imageUrl),
+            price: values.price,
+            quantity: values.quantity,
+            description: values.description
+        }
+            (editOldPicture.id === "") ? createNewPicture(editPicture) : editOldPicture(editPicture);
+
     }
+
+    const createNewPicture = async (editPicture) => {
+        const response = await apiCreateNewPicture(editPicture);
+        console.table(`RESPONSE: ${JSON.stringify(response)}`);
+    }
+
+    const editOldPicture = (editPicture) => {
+        apiEditPicture(editPicture);
+    }
+
+    const validateURL = (value) => {
+        var urlPattern = /^(http|https):\/\//i;
+        return urlPattern.test(value) || 'Please enter a valid URL';
+    };
 
     return (
         <div className="add">
             <h3 className="title">{componentTitle}</h3>
-            <h3>
-                {/* {stampState.title && stampState.ref && <strong> El sello {stampState.title} ha sido creado con el id {stampState.id} </strong>} */}
-            </h3>
-            <form onSubmit={(e) => createNewPicture(e)}>
+            <form ref={formRef} onSubmit={handleSubmit(processPicture)}>
                 <input
-                    type="text"
+                    type="hidden"
                     id="id"
                     name="id"
-                    {...register('id', {
-                        required: true
-                    })}
+                    defaultValue={draftPictureState ? draftPictureState.id : ""}
                     placeholder="ID" />
                 <input
                     type="text"
                     id="title"
                     name="title"
+                    defaultValue={draftPictureState ? draftPictureState.title : ""}
                     {...register('title', {
-                        required: true
+                        required: true,
+                        minLength: 3
                     })}
                     placeholder="Titulo" />
                 <input
                     type="text"
-                    id="ref"
-                    name="ref"
+                    id="reference"
+                    name="reference"
+                    defaultValue={draftPictureState ? draftPictureState.reference : ""}
+                    {...register('reference', {
+                        required: true
+                    })}
                     placeholder="Referencia" />
-                <input
-                    type="text"
-                    id="image"
-                    name="image"
-                    {...register('image', {
-                        required: true
-                    })}
-                    placeholder="Foto" />
-                <input
-                    type="text"
-                    id="image2"
-                    name="image2"
-                    {...register('image2', {
-                        required: true
-                    })}
-                    placeholder="Foto2" />
-
+                {
+                    (draftPictureState && draftPictureState.images && draftPictureState.images.length > 0)
+                        ? draftPictureState.images.map((image, index) => (
+                            <input
+                                key={index}
+                                type="text"
+                                id={`images[${index}]`}
+                                name={`images[${index++}].imageUrl`}
+                                defaultValue={image.imageUrl || ''}
+                                {...register(`images[${index}].imageUrl`, {
+                                    required: true,
+                                    pattern: validateURL
+                                })}
+                                placeholder="Foto" />
+                        ))
+                        : (
+                            <input
+                                type="text"
+                                id={`images[0]`}
+                                name={`images[0].imageUrl`}
+                                defaultValue={""}
+                                {...register('images[0].imageUrl', {
+                                    required: true,
+                                    pattern: validateURL
+                                })}
+                                placeholder="Foto" />
+                        )
+                }
+                <button type="button" onClick={() => append({ imageUrl: '' })}>Agregar</button>
                 <input
                     type="number"
                     id="price"
                     name="price"
+                    defaultValue={draftPictureState ? draftPictureState.price : ""}
                     {...register('price', {
                         required: true
                     })}
@@ -131,6 +153,7 @@ const Creator = ({ setStampsState }) => {
                     type="number"
                     id="quantity"
                     name="quantity"
+                    defaultValue={draftPictureState ? draftPictureState.quantity : ""}
                     {...register('quantity', {
                         required: true
                     })}
@@ -138,18 +161,29 @@ const Creator = ({ setStampsState }) => {
                 <textarea
                     id="description"
                     name="description"
-                    defaulValue="Text here..."
+                    defaultValue={draftPictureState ? draftPictureState.description : ""}
                     {...register('description', {
                         required: true
                     })}
-                    placeholder="Descripción"> </textarea>
+                    placeholder="Descripción"
+                ></textarea>
+                {errors && Object.keys(errors).map(key => (
+                    <p key={key}>{
+                        `Error en: ${key}. ${errors[key]?.type}`
+                    }</p>
+                ))}
                 <input
                     type="submit"
                     id="save"
                     value="Guardar" />
+                <button type="button" onClick={() => resetForm()}>Reset</button>
             </form>
         </div>
     )
 }
 
-export default Creator
+const mapStateToProps = state => ({
+    draftPictureState: state.draftPictureState,
+});
+
+export default connect(mapStateToProps)(Creator);

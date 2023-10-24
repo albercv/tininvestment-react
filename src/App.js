@@ -5,7 +5,7 @@ import Search from "./component/Search";
 
 function App() {
 
-  const [stampsState, setStampsState] = useState([])
+  const [picturesState, setPicturesState] = useState([])
 
   return (
     <div className="layout">
@@ -29,13 +29,13 @@ function App() {
 
     {/*Contenido principal*/}
     <section id="content" className="content">
-      <List stampsState={stampsState} setStampsState={setStampsState}/>
+      <List picturesState={picturesState} setPicturesState={setPicturesState}/>
     </section>
 
     {/*Barra lateral*/}
     <aside className="lateral">
-       <Search stampsState={stampsState} setStampsState={setStampsState}/>
-        <Creator setStampsState={setStampsState}/>
+       <Search picturesState={picturesState} setPicturesState={setPicturesState}/>
+        <Creator draftPictureState={null} setPicturesState={setPicturesState}/>
     </aside>
 
     {/*Pie de página*/}
