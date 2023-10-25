@@ -136,6 +136,10 @@ input[type="button"]{
   padding: 10px;
 }
 
+.error {
+  color: #9b0202;
+}
+
 .picture-item .edit{
   margin-right: 5px;
 }
@@ -143,8 +147,14 @@ input[type="button"]{
 .picture-item .edit:hover{
   background: #e77b00;
 }
+.edit:hover{
+  background: #e77b00;
+}
 
 .picture-item .delete:hover{
+  background: #9b0202;
+}
+.delete:hover{
   background: #9b0202;
 }
 

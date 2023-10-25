@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import EditPicture from './EditPicture';
 import Creator from './Creator';
 import { fetchItems } from '../service/ApiConnection.js'
-import { SaveInStorage } from '../service/SaveInStorage';
+import { SaveInStorageArray, SaveTimeStampInStorage } from '../service/SaveInStorage';
 import { connect } from 'react-redux';
 import { setDraftPicture } from '../action/actions.js';
 
@@ -17,13 +17,14 @@ const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
 
 
   const getPictureList = async () => {
-    const storagedData = dataStoredTime()
-    ? JSON.parse(localStorage.getItem("pictures")) : await fetchFreshData();
+    let storagedData = [{}];
+    storagedData = dataStoredTime()
+      ? JSON.parse(localStorage.getItem("pictures")) : await fetchFreshData();
 
-    setPicturesState(storagedData.data);
+    setPicturesState(storagedData?.data ?? storagedData);
   }
 
-  const dataStoredTime = ()=>{
+  const dataStoredTime = () => {
     const storedTimepicture = Number(localStorage.getItem("timeStamp")) || Date.now();
     const oneHourLaterTimepicture = Date.now();
     return (oneHourLaterTimepicture - storedTimepicture > 360)
@@ -32,8 +33,11 @@ const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
   const fetchFreshData = async () => {
     const freshData = await fetchItems();
 
-    SaveInStorage("pictures", freshData.data);
-    SaveInStorage("timeStamp", freshData.timeStamp);
+    if (freshData && freshData.hasOwnProperty('Error')) {
+      return JSON.parse(localStorage.getItem("pictures"))
+    }
+    SaveInStorageArray("pictures", freshData.data);
+    SaveTimeStampInStorage("timeStamp", freshData.timeStamp);
 
     return freshData;
   }
@@ -51,7 +55,7 @@ const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
 
   return (
     <>
-      {picturesState.length !== 0 ?
+      {picturesState?.length > 0 ?
         picturesState.map(picture => {
           return (<article key={picture.id} className="picture-item">
             <h3 className="title">{picture.title}</h3>
@@ -60,7 +64,7 @@ const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
               <img alt={picture.title} src={picture.images[0].imageUrl} height="100" width="100" />
             </div>
 
-            <button className="edit" onClick={() => { setDraftPicture(picture)}}>Editar</button>
+            <button className="edit" onClick={() => { setDraftPicture(picture) }}>Editar</button>
             <button onClick={e => deletePicture(e, picture)} className="delete">Borrar</button>
           </article>)
         }) : "No hay sellos disponibles"}

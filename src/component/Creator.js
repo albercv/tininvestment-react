@@ -2,22 +2,24 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form';
 import { connect } from 'react-redux';
 import { apiCreateNewPicture, apiEditPicture } from '../service/ApiConnection.js'
+import { setDraftPicture } from '../action/actions.js';
 
-const Creator = ({ draftPictureState, setPicturesState }) => {
+const Creator = ({ draftPictureState, setPicturesState, setDraftPicture }) => {
 
     const componentTitle = "Picture"
     const [setStampState] = useState({})
     const formRef = useRef(null);
+    const [erroSaving, setErrorSaving] = useState({});
 
     const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
         defaultValues: {
-            // id: draftPictureState ? draftPictureState.id : "",
-            // title: draftPictureState ? draftPictureState.title : "",
-            // reference: draftPictureState ? draftPictureState.reference : "",
-            // price: draftPictureState ? draftPictureState.price : "",
-            // quantity: draftPictureState ? draftPictureState.quantity : "",
-            // description: draftPictureState ? draftPictureState.description : "",
-            // images: draftPictureState ? draftPictureState.images : [{ imageUrl: '' }]
+            id: draftPictureState ? draftPictureState.id : "",
+            title: draftPictureState ? draftPictureState.title : "",
+            reference: draftPictureState ? draftPictureState.reference : "",
+            price: draftPictureState ? draftPictureState.price : "",
+            quantity: draftPictureState ? draftPictureState.quantity : "",
+            description: draftPictureState ? draftPictureState.description : "",
+            images: draftPictureState ? draftPictureState.images : [{ imageUrl: '' }]
         }
     });
     const { fields, append, prepend, remove } = useFieldArray({
@@ -32,45 +34,41 @@ const Creator = ({ draftPictureState, setPicturesState }) => {
             title: draftPictureState ? draftPictureState.title : "",
             reference: draftPictureState ? draftPictureState.reference : "",
             price: draftPictureState ? draftPictureState.price : "",
-            quantity: draftPictureState ? draftPictureState.quantity : "",
             description: draftPictureState ? draftPictureState.description : "",
+            quantity: draftPictureState ? draftPictureState.quantity : "",
         })
+
     }, [draftPictureState]);
-
-    const resetForm = () => {
-        reset({
-            id: "",
-            title: "",
-            reference: "",
-            price: "",
-            quantity: "",
-            description: "",
-        })
-
-        remove();
-        append({
-            images: [{ imageUrl: '' }]
-        })
-    };
 
     const processPicture = (values) => {
 
-        let editPicture = {
+        const editPicture = {
             id: values.id,
             title: values.title,
             reference: values.reference,
-            images: values.images.map(imageField => imageField.imageUrl),
+            images: values.images
+                .filter(imageField => imageField?.imageUrl)
+                .map(imageField => imageField.imageUrl),
             price: values.price,
             quantity: values.quantity,
             description: values.description
         }
-            (editOldPicture.id === "") ? createNewPicture(editPicture) : editOldPicture(editPicture);
 
+        if (editPicture.id === "") {
+            createNewPicture(editPicture);
+        } else {
+            editOldPicture(editPicture);
+        }
     }
 
     const createNewPicture = async (editPicture) => {
         const response = await apiCreateNewPicture(editPicture);
-        console.table(`RESPONSE: ${JSON.stringify(response)}`);
+        if (response && response.hasOwnProperty('Error')) {
+            console.table(`RESPONSE: ${JSON.stringify(response)}`);
+            return setErrorSaving({"Title": "No se ha podido guardar en Base de datos"});
+        }
+        setPicturesState(...JSON.stringify(response.data.data))
+        setDraftPicture({})
     }
 
     const editOldPicture = (editPicture) => {
@@ -85,6 +83,7 @@ const Creator = ({ draftPictureState, setPicturesState }) => {
     return (
         <div className="add">
             <h3 className="title">{componentTitle}</h3>
+            {erroSaving && erroSaving["Title"] && <p className="error">{erroSaving["Title"]}</p>}
             <form ref={formRef} onSubmit={handleSubmit(processPicture)}>
                 <input
                     type="hidden"
@@ -173,10 +172,11 @@ const Creator = ({ draftPictureState, setPicturesState }) => {
                     }</p>
                 ))}
                 <input
+                    className="edit"
                     type="submit"
                     id="save"
                     value="Guardar" />
-                <button type="button" onClick={() => resetForm()}>Reset</button>
+                <button type="button" className='delete' onClick={() => { setDraftPicture({}); reset(); }}>Reset</button>
             </form>
         </div>
     )
@@ -186,4 +186,8 @@ const mapStateToProps = state => ({
     draftPictureState: state.draftPictureState,
 });
 
-export default connect(mapStateToProps)(Creator);
+const mapDispatchToProps = {
+    setDraftPicture,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Creator);

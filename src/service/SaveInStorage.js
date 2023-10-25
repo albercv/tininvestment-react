@@ -1,14 +1,22 @@
-export const SaveInStorage = (key, newObject) => {
-    let storagedItems = JSON.parse(localStorage.getItem(key))
+export const SaveTimeStampInStorage = (key, timeStamp) => {
+    let storagedItems = getItemFromStorage(key);
+    storagedItems = timeStamp;
 
-    if(Array.isArray(storagedItems)) {
-        storagedItems.push()
-    } else {
-        storagedItems = newObject
-    }
+    SaveInStorage(key, storagedItems);
+}
 
+export const SaveInStorageArray = (key, newObject) => {
+    let storagedItems = getItemFromStorage(key);
+    storagedItems = [...newObject];
+    
+    SaveInStorage(key, storagedItems);
+}
+
+const getItemFromStorage = (key) => {
+    return JSON.parse(localStorage.getItem(key));
+}
+
+const SaveInStorage = (key, storagedItems) => {
     localStorage.setItem(key, JSON.stringify(storagedItems))
-
-    return newObject;
 }
 

@@ -16,7 +16,7 @@ export const fetchItems = () => {
         })
         .catch(err => {
             console.table(err);
-            return [];
+            return {"Error":JSON.stringify(err)};
         })
         .finally(() => {
             console.log("Clean Up");
@@ -32,11 +32,11 @@ export const apiCreateNewPicture = (newPicture) => {
     })
         .then(res => {
             console.log(JSON.stringify(res));
-            return res.data;
+            return res;
         })
         .catch(err => {
             console.table(err);
-            return [];
+            return {"Error":JSON.stringify(err)};
         })
         .finally(() => {
             console.log("Clean Up");
