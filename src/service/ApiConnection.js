@@ -45,4 +45,42 @@ export const apiCreateNewPicture = (newPicture) => {
 
 export const apiEditPicture = (editPicture) => {
     console.log(`Edit picture: ${JSON.stringify(editPicture)}`);
+    return axios.put(`${API_URL}/picture/edit/${editPicture.id}`, JSON.stringify(editPicture), {
+        headers: {
+            'Authorization': `Basic ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res => {
+            console.log(JSON.stringify(res));
+            return res;
+        })
+        .catch(err => {
+            console.table(err);
+            return {"Error":JSON.stringify(err)};
+        })
+        .finally(() => {
+            console.log("Clean Up");
+        })
+}
+
+export const apiDeletePicture = (id) => {
+    console.log(`Delete picture: ${id}`);
+    return axios.delete(`${API_URL}/picture/delete/${id}`, {
+        headers: {
+            'Authorization': `Basic ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res => {
+            console.log(JSON.stringify(res));
+            return res;
+        })
+        .catch(err => {
+            console.table(`Error: ${JSON.stringify(err)}`);
+            return {"Error":JSON.stringify(err)};
+        })
+        .finally(() => {
+            console.log("Clean Up");
+        })
 }

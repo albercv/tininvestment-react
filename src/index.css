@@ -31,15 +31,10 @@ body{
   background: white;
   text-align: left;
   font-style: italic;
+  padding-left: 2%;
 
   display: flex;
-  justify-content: center;
-}
-
-.logo{
-  width: 40px;
-  height: 40px;
-  border-radius: 300px;
+  justify-content: left;
 }
 
 /* .play{

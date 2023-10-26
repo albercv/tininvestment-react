@@ -7,7 +7,6 @@ import { setDraftPicture } from '../action/actions.js';
 const Creator = ({ draftPictureState, setPicturesState, setDraftPicture }) => {
 
     const componentTitle = "Picture"
-    const [setStampState] = useState({})
     const formRef = useRef(null);
     const [erroSaving, setErrorSaving] = useState({});
 
@@ -22,7 +21,7 @@ const Creator = ({ draftPictureState, setPicturesState, setDraftPicture }) => {
             images: draftPictureState ? draftPictureState.images : [{ imageUrl: '' }]
         }
     });
-    const { fields, append, prepend, remove } = useFieldArray({
+    const { append } = useFieldArray({
         control,
         name: 'images',
     });
@@ -38,7 +37,7 @@ const Creator = ({ draftPictureState, setPicturesState, setDraftPicture }) => {
             quantity: draftPictureState ? draftPictureState.quantity : "",
         })
 
-    }, [draftPictureState]);
+    }, [draftPictureState, reset]);
 
     const processPicture = (values) => {
 
@@ -67,12 +66,18 @@ const Creator = ({ draftPictureState, setPicturesState, setDraftPicture }) => {
             console.table(`RESPONSE: ${JSON.stringify(response)}`);
             return setErrorSaving({"Title": "No se ha podido guardar en Base de datos"});
         }
-        setPicturesState(...JSON.stringify(response.data.data))
         setDraftPicture({})
+        setPicturesState(prevPicturesState => [...prevPicturesState, ...response.data.data]);
     }
 
-    const editOldPicture = (editPicture) => {
-        apiEditPicture(editPicture);
+    const editOldPicture = async (editPicture) => {
+        const response = await apiEditPicture(editPicture);
+        if (response && response.hasOwnProperty('Error')) {
+            console.table(`RESPONSE: ${JSON.stringify(response)}`);
+            return setErrorSaving({"Title": "No se ha podido guardar en Base de datos"});
+        }
+        setPicturesState(prevPicturesState => [...prevPicturesState, ...response.data.data]);
+        setDraftPicture({})
     }
 
     const validateURL = (value) => {

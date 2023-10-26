@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import EditPicture from './EditPicture';
-import Creator from './Creator';
-import { fetchItems } from '../service/ApiConnection.js'
+import { fetchItems, apiDeletePicture } from '../service/ApiConnection.js'
 import { SaveInStorageArray, SaveTimeStampInStorage } from '../service/SaveInStorage';
 import { connect } from 'react-redux';
 import { setDraftPicture } from '../action/actions.js';
@@ -10,6 +8,8 @@ import { setDraftPicture } from '../action/actions.js';
 const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
 
   const [editState, setEditState] = useState(0);
+  const [erroSaving, setErrorSaving] = useState({});
+
 
   useEffect(() => {
     getPictureList();
@@ -42,14 +42,19 @@ const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
     return freshData;
   }
 
-  const deletePicture = (e, picture) => {
+  const deletePicture = async (e, picture) => {
     console.log(picture.id)
-    let localStoragedData = getPictureList();
-    let filteredData = localStoragedData.filter(pictureItem => pictureItem.id !== parseInt(picture.id));
+
+    const response = await apiDeletePicture(picture.id);
+    if (response && response.hasOwnProperty('Error')) {
+      return setErrorSaving({[`${picture.id}`]: "No se ha podido borrar en Base de datos"});
+    }
+    let localStoragedData = JSON.parse(localStorage.getItem("pictures"));
+    let filteredData = localStoragedData.filter(pictureItem => pictureItem.id !== parseInt(picture.id));    
 
     setPicturesState(filteredData);
 
-    localStorage.setItem("pictures", JSON.stringify(filteredData))
+    localStorage.setItem("pictures", JSON.stringify(filteredData));
 
   }
 
@@ -62,6 +67,7 @@ const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
             <p className="description">evolve2digital.com</p>
             <div>
               <img alt={picture.title} src={picture.images[0].imageUrl} height="100" width="100" />
+              {erroSaving && erroSaving[picture.id] && <p className="error">{erroSaving[picture.id]}</p>}
             </div>
 
             <button className="edit" onClick={() => { setDraftPicture(picture) }}>Editar</button>
