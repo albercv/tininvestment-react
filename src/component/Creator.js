@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form';
 import { connect } from 'react-redux';
-import { apiCreateNewPicture, apiEditPicture } from '../service/ApiConnection.js'
+import { useApi } from '../service/ApiConnection.js'
 import { setDraftPicture } from '../action/actions.js';
 
 const Creator = ({ draftPictureState, setPicturesState, setDraftPicture }) => {
@@ -9,6 +9,7 @@ const Creator = ({ draftPictureState, setPicturesState, setDraftPicture }) => {
     const componentTitle = "Picture"
     const formRef = useRef(null);
     const [erroSaving, setErrorSaving] = useState({});
+    const { apiCreateNewPicture, apiEditPicture } = useApi();
 
     const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
         defaultValues: {
@@ -64,20 +65,43 @@ const Creator = ({ draftPictureState, setPicturesState, setDraftPicture }) => {
         const response = await apiCreateNewPicture(editPicture);
         if (response && response.hasOwnProperty('Error')) {
             console.table(`RESPONSE: ${JSON.stringify(response)}`);
-            return setErrorSaving({"Title": "No se ha podido guardar en Base de datos"});
+            return setErrorSaving({ "Title": "No se ha podido guardar en Base de datos" });
         }
-        setDraftPicture({})
-        setPicturesState(prevPicturesState => [...prevPicturesState, ...response.data.data]);
+        // setDraftPicture({})
+        console.log(response.data);
+        setPicturesState(prevPicturesState => [...prevPicturesState, response.data.data]);
     }
 
     const editOldPicture = async (editPicture) => {
         const response = await apiEditPicture(editPicture);
         if (response && response.hasOwnProperty('Error')) {
             console.table(`RESPONSE: ${JSON.stringify(response)}`);
-            return setErrorSaving({"Title": "No se ha podido guardar en Base de datos"});
+            return setErrorSaving({ "Title": "No se ha podido guardar en Base de datos" });
         }
-        setPicturesState(prevPicturesState => [...prevPicturesState, ...response.data.data]);
+
+        const transformedData = transformImages(response.data);
+
+        setPicturesState(prevPicturesState => {
+            return prevPicturesState.map(picture => {
+                return picture.id === response.data.data.id ? transformedData : picture;
+            });
+        });
         setDraftPicture({})
+    }
+
+    const transformImages = (images) => {
+        const dataFromApi = images.data;
+
+        const transformedImages = dataFromApi.images.map((url, index) => {
+            return { id: index + 1, imageUrl: url }; 
+        });
+
+        const transformedData = {
+            ...dataFromApi,  
+            images: transformedImages  
+        };
+
+        return transformedData;
     }
 
     const validateURL = (value) => {

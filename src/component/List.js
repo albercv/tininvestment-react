@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { fetchItems, apiDeletePicture } from '../service/ApiConnection.js'
+import { useApi } from '../service/ApiConnection.js'
 import { SaveInStorageArray, SaveTimeStampInStorage } from '../service/SaveInStorage';
 import { connect } from 'react-redux';
 import { setDraftPicture } from '../action/actions.js';
@@ -7,8 +7,8 @@ import { setDraftPicture } from '../action/actions.js';
 
 const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
 
-  const [editState, setEditState] = useState(0);
   const [erroSaving, setErrorSaving] = useState({});
+  const {fetchItems, apiDeletePicture} = useApi();
 
 
   useEffect(() => {
