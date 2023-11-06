@@ -3,12 +3,14 @@ import { useApi } from '../service/ApiConnection.js'
 import { SaveInStorageArray, SaveTimeStampInStorage } from '../service/SaveInStorage';
 import { connect } from 'react-redux';
 import { setDraftPicture } from '../action/actions.js';
+import { useCookies } from '../provider/CookieProvider.js';
 
 
 const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
 
   const [erroSaving, setErrorSaving] = useState({});
   const {fetchItems, apiDeletePicture} = useApi();
+  const {isAuthenticated} = useCookies();
 
 
   useEffect(() => {
@@ -64,13 +66,17 @@ const List = ({ picturesState, setPicturesState, setDraftPicture }) => {
         picturesState.map(picture => {
           return (<article key={picture.id} className="picture-item">
             <h3 className="title">{picture.title}</h3>
-            <p className="description">evolve2digital.com</p>
+            <p className="price">{picture.price}</p>
+            <p className="description">{picture.description}</p>
             <div>
               <img alt={picture.title} src={picture.images[0].imageUrl} height="100" width="100" />
               {erroSaving && erroSaving[picture.id] && <p className="error">{erroSaving[picture.id]}</p>}
             </div>
 
-            <button className="edit" onClick={() => { setDraftPicture(picture) }}>Editar</button>
+            {isAuthenticated ? 
+            <button className="edit" onClick={() => { setDraftPicture(picture) }}>Editar</button> : 
+            <button className="buy" >Comprar</button>
+            }
             <button onClick={e => deletePicture(e, picture)} className="delete">Borrar</button>
           </article>)
         }) : "No hay sellos disponibles"}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Search = ({ stampsState, setStampsState }) => {
+const Search = ({ picturesState, setPicturesState }) => {
 
     const [searching, setSearching] = useState('');
     const [notFound, setNotFound] = useState(false);
@@ -9,17 +9,20 @@ const Search = ({ stampsState, setStampsState }) => {
         console.log("Search: " + e.target.value);
         setSearching(e.target.value);
 
-        let filteredStamps = stampsState.filter(stamp => {
-            return stamp.title.toLowerCase().includes(searching.toLowerCase());
-        })
-
-        if (searching.length <= 1 || filteredStamps.length <= 0) {
-            filteredStamps = JSON.parse(localStorage.getItem("stamps"));
+        let filteredPictures = picturesState.filter(picture => {
+            return (
+                picture.title.toLowerCase().includes(searching.toLowerCase()) ||
+                (isNaN(Number(searching)) === false && picture.price <= searching)
+            );
+        });
+        
+        if (searching.length <= 1 || filteredPictures.length <= 0) {
+            filteredPictures = JSON.parse(localStorage.getItem("pictures"));
             setNotFound(true);
         } else {
             setNotFound(false);
         }
-        setStampsState(filteredStamps)
+        setPicturesState(filteredPictures)
 
     }
 

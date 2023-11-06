@@ -13,7 +13,7 @@ const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 root.render(
     <Provider store={store}>
-        <GoogleOAuthProvider clientId="194202044967-mqb98cic4o8juocotnkn5vq0v89vojr7.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
             <CookieProvider>
                 <App />
             </CookieProvider>
